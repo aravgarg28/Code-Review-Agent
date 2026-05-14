@@ -28,6 +28,6 @@
 - [x] `backend/github/client.py`: Implement PyGithub wrapper to fetch PR diffs and post inline review comments.
 
 ## Epic 4: Deployment & Tooling
-- [ ] `infrastructure/Dockerfile`: Create multi-stage Dockerfile optimized for AWS Lambda Web Adapter.
-- [ ] `extension/package.json`: Scaffold VS Code extension manifest.
-- [ ] `extension/src/extension.ts`: Implement VS Code command to extract current diff and hit local FastAPI endpoint.
+- [x] `infrastructure/Dockerfile`: Create multi-stage Dockerfile optimized for AWS Lambda Web Adapter.
+- [x] `extension/package.json`: Scaffold VS Code extension manifest.
+- [x] `extension/src/extension.ts`: Implement VS Code command to extract current diff and hit local FastAPI endpoint.
