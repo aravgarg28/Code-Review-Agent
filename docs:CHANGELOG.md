@@ -2,6 +2,27 @@
 
 ## 2026-05-14
 
+### End-to-End Pipeline Validation
+
+**All 5 operational steps passed successfully:**
+
+1. **Infrastructure & Database** — PostgreSQL 16 + pgvector container started via Docker Compose (port 5433). Alembic migration `0001` applied: `repository_context` table created with VECTOR(384) column and IVFFlat cosine index. Verified via `psql`.
+
+2. **ML Pipeline Dry Run** — 1-epoch training on 5 mock JSONL records using `microsoft/codebert-base` with LoRA (r=8, alpha=16). Training completed in 14 seconds. Eval F1 macro: 0.33 (expected for 5 samples / 1 epoch). ONNX export + int8 dynamic quantization produced `model_quantized.onnx` (120MB).
+
+3. **RAG Ingestion** — Ingested 180 chunks across 18 files from this repo into pgvector. Fixed critical bug: `discover_files()` was scanning `.venv/` (thousands of site-packages files), causing hour-long hangs. Added exclusion set: `.venv`, `venv`, `__pycache__`, `outputs`, `wandb`.
+
+4. **End-to-End API Test** — FastAPI server booted with quantized ONNX model. `POST /api/v1/review/diff` returned 200 OK with full classification probabilities in 286ms (P90 target: <800ms). Model output is near-uniform (expected — only 1 training epoch on 5 samples).
+
+5. **Extension Build** — `npm install` (0 vulnerabilities) + `tsc` compiled `extension.ts` with `strict: true` and zero errors. Output: `extension/out/extension.js`.
+
+**Bugs fixed during validation:**
+- `backend/rag/ingest.py`: Added `.venv`, `venv`, `__pycache__`, `outputs`, `wandb` to excluded directories in `discover_files()`.
+- `ml/export.py`: Fixed `merge_peft_weights()` to read `base_model_name_or_path` from `adapter_config.json` instead of trying to load a full model from the checkpoint directory (which only contains adapter weights).
+- `ml/train.py`: Added `wandb_enabled` config flag (defaults to `True`). When `False`, `report_to` switches to `["none"]` and W&B init/finish are skipped, preventing login prompts from blocking dry runs.
+
+---
+
 ### `ml/data.py` — PyTorch Dataset for PR Diff Parsing (Epic 1, Task 1)
 
 **Added:**
