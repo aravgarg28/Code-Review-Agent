@@ -1,0 +1,44 @@
+{
+  "name": "code-review-agent",
+  "displayName": "Code Review Agent",
+  "description": "AI-powered code review that detects anti-patterns in your Git diffs",
+  "version": "0.1.0",
+  "publisher": "code-review-agent",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeReviewAgent.reviewDiff",
+        "title": "Code Review Agent: Review Current Diff"
+      }
+    ],
+    "configuration": {
+      "title": "Code Review Agent",
+      "properties": {
+        "codeReviewAgent.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:8080",
+          "description": "Base URL of the Code Review Agent API"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}
