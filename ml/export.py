@@ -56,14 +56,19 @@ def merge_peft_weights(checkpoint_dir: Path, num_labels: int) -> Path:
 
     logger.info("merging_lora", extra={"checkpoint": str(checkpoint_dir)})
 
+    adapter_config_path = checkpoint_dir / "adapter_config.json"
+    with adapter_config_path.open("r", encoding="utf-8") as f:
+        adapter_cfg = json.load(f)
+    base_model_name: str = adapter_cfg["base_model_name_or_path"]
+
     base_model = AutoModelForSequenceClassification.from_pretrained(
-        checkpoint_dir,
+        base_model_name,
         num_labels=num_labels,
     )
     model = PeftModel.from_pretrained(base_model, checkpoint_dir)
-    model = model.merge_and_unload()
+    merged_model = model.merge_and_unload()
 
-    model.save_pretrained(merged_dir)
+    merged_model.save_pretrained(merged_dir, safe_serialization=True)
     tokenizer = AutoTokenizer.from_pretrained(checkpoint_dir)
     tokenizer.save_pretrained(merged_dir)
 

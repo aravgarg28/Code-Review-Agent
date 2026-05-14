@@ -77,6 +77,7 @@ class TrainingConfig(BaseModel):
     # W&B
     wandb_project: str = Field(default="code-review-agent")
     wandb_run_name: str | None = Field(default=None)
+    wandb_enabled: bool = Field(default=True)
 
 
 # ---------------------------------------------------------------------------
@@ -187,7 +188,7 @@ def train(config: TrainingConfig) -> Path:
         metric_for_best_model="f1_macro",
         greater_is_better=True,
         logging_steps=10,
-        report_to=["wandb"],
+        report_to=["wandb"] if config.wandb_enabled else ["none"],
         run_name=config.wandb_run_name,
         seed=config.seed,
         remove_unused_columns=False,
@@ -234,18 +235,22 @@ def main() -> None:
 
     config = TrainingConfig.model_validate(raw)
 
-    import wandb
+    if config.wandb_enabled:
+        import wandb
 
-    wandb.init(
-        project=config.wandb_project,
-        name=config.wandb_run_name,
-        config=config.model_dump(mode="json"),
-    )
+        wandb.init(
+            project=config.wandb_project,
+            name=config.wandb_run_name,
+            config=config.model_dump(mode="json"),
+        )
 
     best = train(config)
     print(f"Best checkpoint saved to: {best}")
 
-    wandb.finish()
+    if config.wandb_enabled:
+        import wandb
+
+        wandb.finish()
 
 
 if __name__ == "__main__":

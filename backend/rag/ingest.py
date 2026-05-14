@@ -61,7 +61,8 @@ def discover_files(repo_path: Path) -> list[Path]:
     files: list[Path] = []
     for path in repo_path.rglob("*"):
         if path.is_file() and path.suffix in SUPPORTED_EXTENSIONS:
-            if ".git" not in path.parts and "node_modules" not in path.parts:
+            excluded = {".git", "node_modules", ".venv", "venv", "__pycache__", "outputs", "wandb"}
+            if not excluded.intersection(path.parts):
                 files.append(path)
 
     logger.info("files_discovered", extra={"count": len(files), "repo": str(repo_path)})

@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific
+outputs/
+wandb/
+data/
+infrastructure/.env
+extension/out/
+extension/node_modules/
+.DS_Store
+.Rhistory
